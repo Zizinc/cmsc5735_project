@@ -1,0 +1,3 @@
+Flask==0.12
+CherryPy==14.0
+Paste==2.0
