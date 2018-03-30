@@ -35,18 +35,10 @@
 					<li class="text-center">
 					</li>
 						<br/> <br/>
-                    <li>
-                        <a class="active-menu" href="dashboard/"><i class="fa fa-dashboard fa-3x"></i> Dashboard</a>
-                    </li>
 					<li>
-						<a href="search/"><i class="fa fa-search fa-3x"></i> Popular in Yelp </a>
+						<a class="active-menu" href="user_query/"><i class="fa fa-search fa-3x"></i> User Query </a>
 					</li>
-                    <li>
-                        <a href="#"><i class="fa fa-desktop fa-3x"></i> User Behavior Analysis</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-table fa-3x"></i> Statistics</a>
-                    </li>
+					
                 </ul>
             </div>
         </nav>  
@@ -55,42 +47,73 @@
             <div id="page-inner">
                 <div class="row">
                     <div class="col-md-12">
-                     <h2>Dashboard</h2>
+                     <h2>User Query</h2>
                     </div>
                 </div>              
                  <!-- /. ROW  -->
                   <hr />
                 <div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="panel panel-default">
-							<div class="panel-heading">
-							   Spark Cluster Connection Status
+                        <form id="userQueryForm" role="form">
+							<div class="form-group">
+								<label>User Id</label>
+                                <input class="form-control" type="text" name="userId" />
+
 							</div>
-							<div class="panel-body">
-								<span class="label label-success">Success</span>
-								<p>Connection OK! You can play around with Yelp review data!</p>
-								<p>{{city}}</p>
-							</div>
-						</div>
+							<button type="submit" class="btn btn-default">Submit Button</button>
+
+						</form>
 					</div>
 				</div>
                  <!-- /. ROW  -->
                 <hr />                
                 <div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
-               
 						<div class="panel panel-default">
 							<div class="panel-heading">
-							   Spark Tables Information
+							   Basic Yelp User Information
 							</div>
 							<div class="panel-body">
 								<div class="table-responsive">
-									<table id="yelpTableInformation" class="table table-striped table-bordered table-hover">
+									<table id="basicYelpUserInformationTable" class="table table-striped table-bordered table-hover">
 										<thead>
 											<tr>
-												<th>Table Name</th>
-												<th>Number of Records</th>
-												<th>Number of Columns</th>
+												<th>User Id</th>
+												<th>User Name</th>
+												<th>Review Counts</th>
+												<th>Number of Friends</th>
+												<th>Average Stars</th>
+												<th>Useful Sum</th>
+												<th>Funny Sum</th>
+												<th>Cool Sum</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				 <!-- /. ROW  -->
+                <hr />                
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+							   Reviews by User
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive">
+									<table id="reviewsTable" class="table table-striped table-bordered table-hover">
+										<thead>
+											<tr>
+												<th>Business Id</th>
+												<th>Stars</th>
+												<th>Date</th>
+												<th>Reviews</th>
+												<th>Useful</th>
+												<th>Funny</th>
+												<th>Cool</th>
 											</tr>
 										</thead>
 									</table>
@@ -119,39 +142,62 @@
     <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
     <!-- SCRIPTS ON PAGE -->
 	<script  type="text/javascript">
-		$.ajax({
-			url: "/ajax_data?dataName=yelpTableInformation",
-			success : function(data) {
-				var json_list = JSON.parse(data);
-				
-				$('#yelpTableInformation').dataTable( {
-					data : json_list,
-					columns: [
-						{"data" : "table_name"},
-						{"data" : "num_of_record"},
-						{"data" : "num_of_col"}
-					],
-				});
-			}       
-		});
+		function updateUserBasicInformationTable() {
+			$.ajax({
+				type: "POST",
+				url: "/ajax_data?dataName=userBasicInformationByUserId",
+				data: $("#userQueryForm").serialize(), // serializes the form's elements.
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					$('#basicYelpUserInformationTable').dataTable( {
+						destroy: true,
+						data : json_list,
+						columns: [
+							{"data" : "user_id"},
+							{"data" : "name"},
+							{"data" : "review_count"},
+							{"data" : "num_of_friends"},
+							{"data" : "avg_stars"},
+							{"data" : "useful_sum"},
+							{"data" : "funny_sum"},
+							{"data" : "cool_sum"}
+						],
+					});
+				}
+			 });
+		}
 		
-		/*
-			$('#yelpTableInformation').DataTable( {
-				"ajax": "/ajax_data?dataName=yelpTableInformation",
-				"dataSrc" : function (json) {
-					// manipulate your data (json)
-					console.log(json);
-
-					// return the data that DataTables is to use to draw the table
-					return json.data;
-				},
-				"columns": [
-                    { "data": "table_name" },
-                    { "data": "num_of_record" },
-                    { "data": "num_of_col" },
-                    ]
-			} );
-		*/
+		function updateReviewTable() {
+			$.ajax({
+				type: "POST",
+				url: "/ajax_data?dataName=reviewsByUserId",
+				data: $("#userQueryForm").serialize(), // serializes the form's elements.
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					$('#reviewsTable').dataTable( {
+						destroy: true,
+						data : json_list,
+						columns: [
+						{"data" : "business_id"},
+							{"data" : "stars"},
+							{"data" : "date"},
+							{"data" : "reviews"},
+							{"data" : "useful"},
+							{"data" : "funny"},
+							{"data" : "cool"}
+						],
+					});
+				}
+			 });
+		}
+		
+		$("#userQueryForm").submit(function(e) {
+			updateUserBasicInformationTable();
+			updateReviewTable();
+			e.preventDefault(); // avoid to execute the actual submit of the form.
+		});
 	</script>
    
 </body>

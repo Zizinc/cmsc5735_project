@@ -9,13 +9,20 @@ main = Blueprint('main', __name__)
 @main.route('/dashboard')
 def dashboard_page():
 	#distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct city FROM yelp_business ORDER BY city")
-	#city = distinctBusinessCityDf.collect()[0]
+	#city = distinctBusinessCityDf.collect()
 	return render_template('dashboard.html')
 
-@main.route('/ajax_data', methods=['GET'])
+@main.route('/user_query')
+def user_query_page():
+	return render_template('user_query.html')
+
+@main.route('/ajax_data', methods=['GET', 'POST'])
 def handle_ajax_data():
-	return ajax_data_handler.handle_ajax_data(request.args.get("dataName"))
-	
+	if request.method == 'GET':
+		return ajax_data_handler.handle_ajax_data(request.args.get("dataName"))
+	else:
+		return ajax_data_handler.handle_post_ajax_data(request.args.get("dataName"), request)
+
 def create_app(spark_engine):
 	global engine
 	global ajax_data_handler

@@ -5,11 +5,17 @@ RUN apt-get update -y && apt-get -y install curl
 RUN apt-get install -y python-pip python-dev build-essential
 
 # JAVA
-#RUN apt-get install python-software-properties
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:webupd8team/java
-RUN apt-get update
-RUN apt-get install oracle-java8-installer -y -y
+RUN apt-get -y install default-jre
+RUN apt-get install -y software-properties-common python-software-properties
+
+RUN apt-get -y -q update && \
+    apt-get -y -q upgrade && \
+    apt-get -y -q install software-properties-common htop && \
+    add-apt-repository ppa:webupd8team/java && \
+    apt-get -y -q update && \
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get -y -q install oracle-java8-installer && \
+    update-java-alternatives -s java-8-oracle
 
 # SPARK
 ARG SPARK_ARCHIVE=https://archive.apache.org/dist/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz
@@ -22,6 +28,9 @@ ENV PATH $PATH:$SPARK_HOME/bin
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
+
+# SETUP DATA (can be remove in production)
+COPY ./data /data
 
 # Run without Spark
 #ENTRYPOINT ["python"]
