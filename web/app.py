@@ -9,16 +9,34 @@ main = Blueprint('main', __name__)
 @main.route('/dashboard')
 def dashboard_page():
 	#distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct city FROM yelp_business ORDER BY city")
-	distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct name,city,review_count,address FROM yelp_business WHERE review_count > 1000 ORDER BY review_count desc ")
+	#distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct name,city,review_count,address FROM yelp_business WHERE review_count > 1000 ORDER BY review_count desc ")
 	#Select those cities with review_count > 200
-	city = distinctBusinessCityDf.collect()
+	#city = distinctBusinessCityDf.collect()
 
 	UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
 	#Select those users with high review count
 
 	user = UserInfo.collect()
 
-	return render_template('dashboard.html', city=city,user=user)
+	return render_template('dashboard.html',user=user)
+
+@main.route('/city')
+def City_Summary_Page():
+	#distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct city FROM yelp_business ORDER BY city")
+	distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct name,city,review_count,address FROM yelp_business WHERE review_count > 1000 ORDER BY review_count desc ")
+	#Select those cities with review_count > 200
+	city = distinctBusinessCityDf.collect()
+
+	# UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
+	# #Select those users with high review count
+	#
+	# user = UserInfo.collect()
+
+	return render_template('CitySummary.html', city=city)
+@main.route('/cityplot')
+def City_Plot_Page():
+
+	return render_template('CityPlot.html')
 
 @main.route('/ajax_data', methods=['GET'])
 def handle_ajax_data():
