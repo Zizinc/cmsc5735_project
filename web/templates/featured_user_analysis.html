@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+      <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSMC5735 Project: Mining on Yelp Reviews</title>
+	<!-- BOOTSTRAP STYLES-->
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" />
+     <!-- FONTAWESOME STYLES-->
+    <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet" />
+     <!-- MORRIS CHART STYLES-->
+    <link href="{{ url_for('static', filename='js/morris/morris-0.4.3.min.css') }}" rel="stylesheet" />
+        <!-- CUSTOM STYLES-->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
+     <!-- GOOGLE FONTS-->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+</head>
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Mining on Yelp</a> 
+            </div>
+        </nav>   
+           <!-- /. NAV TOP  -->
+                <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+					<li class="text-center">
+					</li>
+						<br/> <br/>
+					<li>
+						<a class="active-menu" href="featured_user_analysis/"><i class="fa fa-search fa-3x"></i> Featured User Analysis </a>
+					</li>
+					
+                </ul>
+            </div>
+        </nav>  
+        <!-- /. NAV SIDE  -->
+        <div id="page-wrapper" >
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                     <h2>Featured User Analysis</h2>
+                    </div>
+                </div>              
+                 <!-- /. ROW  -->
+                  <hr />
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="panel panel-default">
+							<div class="panel-heading">
+							   Star Rating Distribution
+							</div>
+							<div class="panel-body">
+								<button id="starRatingDistributionBtn">Run</button>
+								<div id="starRatingDistributionChart"></div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+                 <!-- /. ROW  -->
+                <hr />                
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+							   Analysis on Top Users
+							</div>
+							<div class="panel-body">
+								<button id="analysisOnTopUsersBtn">Run</button>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="reviewCountVsUsefulChart"></canvas>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="reviewCountVsFansChart"></canvas>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="reviewCountVsNumOfFriendsChart"></canvas>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="usefulVsFansChart"></canvas>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="usefulVsNumOfFriendsChart"></canvas>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<canvas id="fansVsNumOfFriendsChart"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				 <!-- /. ROW  -->
+                <hr />                
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+							   Review Numbers Distribution
+							</div>
+							<div class="panel-body">
+								<button id="reviewNumbersDistributionBtn">Run</button>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+				 <!-- /. ROW  -->
+                <hr />                
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+							   User Checkin Patterns
+							</div>
+							<div class="panel-body">
+								<button id="userCheckinPatternsBtn">Run</button>
+								
+						</div>
+					</div>
+				</div>
+             <!-- /. PAGE INNER  -->
+            </div>
+         <!-- /. PAGE WRAPPER  -->
+        </div>
+     <!-- /. WRAPPER  -->
+    <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+    <!-- JQUERY SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/jquery-1.10.2.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/dataTables/jquery.dataTables.js') }}"></script>
+      <!-- BOOTSTRAP SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- METISMENU SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/jquery.metisMenu.js') }}"></script>
+     <!-- MORRIS CHART SCRIPTS -->
+     <script src="{{ url_for('static', filename='js/morris/raphael-2.1.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/morris/morris.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/chart/Chart.bundle.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/chart/utils.js') }}"></script>
+      <!-- CUSTOM SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+    <!-- SCRIPTS ON PAGE -->
+	<script  type="text/javascript">
+		$("#starRatingDistributionBtn").click(function(){
+			$.ajax({
+				type: "GET",
+				url: "/ajax_data?dataName=starRatingDistribution",
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					Morris.Bar({
+						element: 'starRatingDistributionChart',
+						data: json_list,
+						xkey: 'x',
+						ykeys: ['y'],
+						labels: ['Star Counts'],
+						hideHover: 'auto',
+						resize: true,
+						axes: true
+						/*
+						barColors: function (row, series, type) {
+							var color_list= ['#ff3333', '#ff7733', '#ffff33', '#47d147', '#33ffff', '#0066ff', '#cc0099'];
+							console.log(series);
+							console.log(series.index);
+							console.log(color_list[0]);
+							console.log(color_list[series.index % 7]);
+							return color_list[Math.floor((Math.random() * 7))];
+						}
+						*/
+					});
+				}
+			 });
+		});
+	
+	</script>
+	<script  type="text/javascript">
+		function updateScatterChart(data, pColor, chartId, title) {
+			var color = Chart.helpers.color;
+			var scatterChartData = {
+				datasets: [{
+					label: 'Dataset',
+					borderColor: pColor,
+					backgroundColor: color(pColor).alpha(0.2).rgbString(),
+					data: data
+				}]
+			};
+			
+			var ctx = document.getElementById(chartId).getContext('2d');
+			window.myScatter = Chart.Scatter(ctx, {
+				data: scatterChartData,
+				options: {
+					title: {
+						display: true,
+						text: title
+					},
+				}
+			});
+		}
+		$("#analysisOnTopUsersBtn").click(function(){
+			$.ajax({
+				type: "GET",
+				url: "/ajax_data?dataName=analysisOnTopUsers",
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					var reviewCountAndUseful = [];
+					var reviewCountAndFans = [];
+					var reviewCountAndNumOfFriends = [];
+					var usefulAndFans = []
+					var usefulAndNumOfFriends = [];
+					var fansAndNumOfFriends = []
+					for (var i = 0; i < json_list.length; i++) {
+						var row = json_list[i];
+						reviewCountAndUseful.push({
+							x: row.review_count,
+							y: row.useful
+						});
+						
+						reviewCountAndFans.push({
+							x: row.review_count,
+							y: row.fans
+						});
+						
+						reviewCountAndNumOfFriends.push({
+							x: row.review_count,
+							y: row.num_of_friends
+						});
+						
+						usefulAndFans.push({
+							x: row.useful,
+							y: row.fans
+						});
+						
+						usefulAndNumOfFriends.push({
+							x: row.useful,
+							y: row.num_of_friends
+						});
+						
+						fansAndNumOfFriends.push({
+							x: row.fans,
+							y: row.num_of_friends
+						});
+					}
+					
+					var chart_list = [
+						{
+							"data": reviewCountAndUseful,
+							"color" : window.chartColors.red,
+							"chartId": "reviewCountVsUsefulChart",
+							"title": "Review Count V.s. Useful"
+						},
+						{
+							"data": reviewCountAndFans,
+							"color" : window.chartColors.orange,
+							"chartId": "reviewCountVsFansChart",
+							"title": "Review Count V.s. Fans"
+						},
+						{
+							"data": reviewCountAndNumOfFriends,
+							"color" : window.chartColors.yellow,
+							"chartId": "reviewCountVsNumOfFriendsChart",
+							"title": "Review Count V.s. Num of Friends"
+						},
+						{
+							"data": usefulAndFans,
+							"color" : window.chartColors.green,
+							"chartId": "usefulVsFansChart",
+							"title": "Useful V.s. Fans"
+						},
+						{
+							"data": usefulAndNumOfFriends,
+							"color" : window.chartColors.blue,
+							"chartId": "usefulVsNumOfFriendsChart",
+							"title": "Useful V.s. Num of Friends"
+						},
+						{
+							"data": fansAndNumOfFriends,
+							"color" : window.chartColors.purple,
+							"chartId": "fansVsNumOfFriendsChart",
+							"title": "Fans V.s. Num of Friends"
+						},
+					];
+					
+					for (var i = 0; i < chart_list.length; i++) {
+						var row = chart_list[i];
+						updateScatterChart(row.data, row.color, row.chartId, row.title);
+					}
+				}
+			 });
+		});
+	</script>
+</body>
+</html>

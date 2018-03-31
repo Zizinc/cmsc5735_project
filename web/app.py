@@ -16,6 +16,10 @@ def dashboard_page():
 def user_query_page():
 	return render_template('user_query.html')
 
+@main.route('/featured_user_analysis')
+def featured_user_analysis_page():
+	return render_template('featured_user_analysis.html')
+	
 @main.route('/ajax_data', methods=['GET', 'POST'])
 def handle_ajax_data():
 	if request.method == 'GET':

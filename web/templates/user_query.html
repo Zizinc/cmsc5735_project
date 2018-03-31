@@ -86,6 +86,7 @@
 												<th>Useful Sum</th>
 												<th>Funny Sum</th>
 												<th>Cool Sum</th>
+												<th>Number of Fans</th>
 											</tr>
 										</thead>
 									</table>
@@ -151,6 +152,10 @@
 				{	
 					var json_list = JSON.parse(data);
 					$('#basicYelpUserInformationTable').dataTable( {
+						"bPaginate": false,
+						"bLengthChange": false,
+						"bFilter": false,
+						"bInfo": false,
 						destroy: true,
 						data : json_list,
 						columns: [
@@ -158,10 +163,11 @@
 							{"data" : "name"},
 							{"data" : "review_count"},
 							{"data" : "num_of_friends"},
-							{"data" : "avg_stars"},
+							{"data" : "average_stars"},
 							{"data" : "useful_sum"},
 							{"data" : "funny_sum"},
-							{"data" : "cool_sum"}
+							{"data" : "cool_sum"},
+							{"data" : "num_of_fans"}
 						],
 					});
 				}
@@ -177,6 +183,10 @@
 				{	
 					var json_list = JSON.parse(data);
 					$('#reviewsTable').dataTable( {
+						"bPaginate": false,
+						"bLengthChange": false,
+						"bFilter": false,
+						"bInfo": false,
 						destroy: true,
 						data : json_list,
 						columns: [

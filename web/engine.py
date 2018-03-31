@@ -14,12 +14,18 @@ class SparkEngine:
 			.getOrCreate()
 
 	def load_csv_to_table(self):
-		#file_path = "/home/ubuntu/Downloads/spark-2.1.0-bin-hadoop2.7/cmsc5735_project/data/yelp_business_small_1000.csv"
-		file_path = "/data/yelp_business_small_1000.csv"
-		yelpBusinessDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED")
-		#self.spark.sql("DROP TABLE IF EXISTS yelp_business")
+		file_path = "data/yelp_business_small_1000.csv"
+		yelpBusinessDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED", multiLine=True)
 		yelpBusinessDf.registerTempTable("yelp_business")
-		#yelpBusinessDf.write.saveAsTable("yelp_business")
+		
+		file_path = "data/yelp_review_small_1000.csv"
+		yelpReviewDf = self.spark.read.csv(file_path, header=True, multiLine=True)
+		yelpReviewDf.registerTempTable("yelp_review")
+		
+		file_path = "data/yelp_user_small_1000.csv"
+		yelpUserDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED", multiLine=True)
+		yelpUserDf.registerTempTable("yelp_user")
+		
 		
 		# Test
 		#distinctBusinessCityDf = self.spark.sql("SELECT distinct city FROM yelp_business ORDER BY city")

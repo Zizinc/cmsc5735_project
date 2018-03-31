@@ -18,10 +18,10 @@ RUN apt-get -y -q update && \
     update-java-alternatives -s java-8-oracle
 
 # SPARK
-ARG SPARK_ARCHIVE=https://archive.apache.org/dist/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz
+ARG SPARK_ARCHIVE=http://apache.communilink.net/spark/spark-2.2.0/spark-2.2.0-bin-hadoop2.7.tgz
 RUN curl -s $SPARK_ARCHIVE | tar -xz -C /usr/local/
 
-ENV SPARK_HOME /usr/local/spark-2.1.0-bin-hadoop2.7
+ENV SPARK_HOME /usr/local/spark-2.2.0-bin-hadoop2.7
 ENV PATH $PATH:$SPARK_HOME/bin
 
 # SETUP APPLICATION
