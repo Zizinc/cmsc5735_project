@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+      <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSMC5735 Project: Mining on Yelp Reviews</title>
+	<!-- BOOTSTRAP STYLES-->
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" />
+     <!-- FONTAWESOME STYLES-->
+    <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet" />
+     <!-- MORRIS CHART STYLES-->
+    <link href="{{ url_for('static', filename='js/morris/morris-0.4.3.min.css') }}" rel="stylesheet" />
+        <!-- CUSTOM STYLES-->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
+	<link href="{{ url_for('static', filename='css/leaflet.css') }}" rel="stylesheet" />
+	<style>
+        #cityHeatMap { width: 800px; height: 600px; }
+    </style>
+     <!-- GOOGLE FONTS-->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+</head>
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Mining on Yelp</a> 
+            </div>
+        </nav>   
+           <!-- /. NAV TOP  -->
+                <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+					<li class="text-center">
+					</li>
+						<br/> <br/>
+					<li>
+						<a class="active-menu" href="featured_city_analysis/"><i class="fa fa-search fa-3x"></i> Featured City Analysis </a>
+					</li>
+					
+                </ul>
+            </div>
+        </nav>  
+        <!-- /. NAV SIDE  -->
+        <div id="page-wrapper" >
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                     <h2>Featured City Analysis</h2>
+                    </div>
+                </div>			
+                 <!-- /. ROW  -->
+                  <hr />
+                <div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="panel panel-default">
+							<div class="panel-heading">
+							   City Heat Map
+							</div>
+							<div class="panel-body">
+								<form id="cityQueryForm" role="form">
+									<div class="form-group">
+										<label>City</label>
+										<input class="form-control" type="text" name="city" placeholder="Las Vegas" />
+
+									</div>
+									<button type="submit" class="btn btn-default">Submit Button</button>
+
+								</form>
+								<br/>
+								<div id="cityHeatMap"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+             <!-- /. PAGE INNER  -->
+            </div>
+         <!-- /. PAGE WRAPPER  -->
+        </div>
+     <!-- /. WRAPPER  -->
+    <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+    <!-- JQUERY SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/jquery-1.10.2.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/dataTables/jquery.dataTables.js') }}"></script>
+      <!-- BOOTSTRAP SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- METISMENU SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/jquery.metisMenu.js') }}"></script>
+     <!-- MORRIS CHART SCRIPTS -->
+     <script src="{{ url_for('static', filename='js/morris/raphael-2.1.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/morris/morris.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/chart/Chart.bundle.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/chart/utils.js') }}"></script>
+      <!-- CUSTOM SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/leaflet/leaflet.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/leaflet/leaflet-heat.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/leaflet/realworld.10000.js') }}"></script>
+    <!-- SCRIPTS ON PAGE -->
+<script>
+	var map;
+	$("#cityQueryForm").submit(function(e) {
+		
+		$.ajax({
+			type: "POST",
+			url: "/ajax_data?dataName=businessHeatMap",
+			data: $("#cityQueryForm").serialize(), // serializes the form's elements.
+			success: function(data)
+			{	
+				var json_list = JSON.parse(data);
+				var map_center = json_list["map_center"];
+				var business_list = json_list["business_list"];
+				//var map_center = [-37.87, 175.475];
+				//var business_list = addressPoints;
+				if (map != undefined) { map.remove(); }
+				map = L.map('cityHeatMap').setView(map_center, 12);
+
+				var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+					attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+				}).addTo(map);
+
+				business_list = business_list.map(function (p) { return [p[0], p[1]]; });
+
+				var heat = L.heatLayer(business_list, {radius: 14}).addTo(map);
+			}
+		 });
+		
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+	});
+
+</script>
+</body>
+</html>

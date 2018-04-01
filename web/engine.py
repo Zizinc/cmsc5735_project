@@ -14,8 +14,8 @@ class SparkEngine:
 			.getOrCreate()
 
 	def load_csv_to_table(self):
-		file_path = "data/yelp_business_small_1000.csv"
-		yelpBusinessDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED", multiLine=True)
+		file_path = "data/yelp_business.csv"
+		yelpBusinessDf = self.spark.read.csv(file_path, header=True)
 		yelpBusinessDf.registerTempTable("yelp_business")
 		
 		file_path = "data/yelp_review_small_1000.csv"

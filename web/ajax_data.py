@@ -31,6 +31,9 @@ class AjaxDataHandler:
 			return self.ajax_yelp_review_numbers_distribuion()
 		elif data_name == "userCheckin":
 			return self.ajax_yelp_user_checkin()
+		elif data_name == "businessHeatMap":
+			city = request.form["city"]
+			return self.ajax_yelp_business_heat_map(city)
 		else:
 			msg = {"error_message": "data name is undefined"}
 			return json.dumps(msg)
@@ -208,6 +211,38 @@ class AjaxDataHandler:
 				}]
 		return json.dumps(checkin_data)
 		
-	
+	def ajax_yelp_business_heat_map(self, city):
+		businessDf = self.spark_engine.get_spark().sql("SELECT city, latitude, longitude, stars, review_count FROM yelp_business")
+		businessDf = businessDf.filter(businessDf["city"] == city)
+		businessDf = businessDf.withColumn("latitude", businessDf["latitude"].cast("double")) \
+			.withColumn("longitude", businessDf["longitude"].cast("double")) \
+			.withColumn("stars", businessDf["stars"].cast("int")) \
+			.withColumn("review_count", businessDf["review_count"].cast("int"))
+		
+		businessDf = businessDf.withColumn("popularity", businessDf["stars"] * businessDf["review_count"] * 100)
+		sumBusinessDf = businessDf.groupBy("city").agg({'latitude': 'sum', 'longitude': 'sum', '*': 'count'}) \
+			.withColumnRenamed("SUM(latitude)", "latitude") \
+			.withColumnRenamed("SUM(longitude)", "longitude") \
+			.withColumnRenamed("COUNT(1)", "count")
+		
+		map_center = [0, 0]
+		for row in sumBusinessDf.collect():
+			map_center[0] = float(row["latitude"]) / row["count"]
+			map_center[1] = float(row["longitude"]) / row["count"]
+		
+		business_list = []
+		for row in businessDf.collect():
+			business_list.append([
+				row["latitude"],
+				row["longitude"],
+				str(row["popularity"])
+			])
+		data = {
+			"map_center": map_center,
+			"business_list": business_list
+			#"business_list": []
+			}
+		return json.dumps(data)
+		
 	def __init__(self, spark_engine):
 		self.spark_engine = spark_engine
