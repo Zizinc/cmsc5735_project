@@ -26,6 +26,9 @@ class SparkEngine:
 		yelpUserDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED", multiLine=True)
 		yelpUserDf.registerTempTable("yelp_user")
 		
+		file_path = "data/yelp_checkin_small_1000.csv"
+		yelpCheckinDf = self.spark.read.csv(file_path, header=True)
+		yelpCheckinDf.registerTempTable("yelp_checkin")
 		
 		# Test
 		#distinctBusinessCityDf = self.spark.sql("SELECT distinct city FROM yelp_business ORDER BY city")

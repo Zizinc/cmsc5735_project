@@ -114,7 +114,14 @@
 							</div>
 							<div class="panel-body">
 								<button id="reviewNumbersDistributionBtn">Run</button>
-								
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div id="reviewNumbersPdfChart"></div>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div id="reviewNumbersCdfChart"></div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -129,7 +136,85 @@
 							</div>
 							<div class="panel-body">
 								<button id="userCheckinPatternsBtn">Run</button>
-								
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Mon
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinMonChart"></div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Tue
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinTueChart"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Wed
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinWedChart"></div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Thu
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinThuChart"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Fri
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinFriChart"></div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Sat
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinSatChart"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6 col-sm-6 col-xs-6">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+											   Sun
+											</div>
+											<div class="panel-body">
+												<div id="userCheckinSunChart"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -298,6 +383,66 @@
 					for (var i = 0; i < chart_list.length; i++) {
 						var row = chart_list[i];
 						updateScatterChart(row.data, row.color, row.chartId, row.title);
+					}
+				}
+			 });
+		});
+	</script>
+	<script  type="text/javascript">
+		$("#reviewNumbersDistributionBtn").click(function(){
+			$.ajax({
+				type: "GET",
+				url: "/ajax_data?dataName=reviewNumbersDistribution",
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					Morris.Line({
+						element: 'reviewNumbersPdfChart',
+						data: json_list,
+						xkey: 'review_count',
+						ykeys: ['pdf'],
+						labels: ['pdf'],
+						hideHover: 'auto',
+						resize: true,
+						parseTime:false
+					});
+					
+					Morris.Line({
+						element: 'reviewNumbersCdfChart',
+						data: json_list,
+						xkey: 'review_count',
+						ykeys: ['cdf'],
+						labels: ['cdf'],
+						hideHover: 'auto',
+						resize: true,
+						parseTime:false
+					});
+				}
+			 });
+		});
+	</script>
+	<script  type="text/javascript">
+		$("#userCheckinPatternsBtn").click(function(){
+			$.ajax({
+				type: "GET",
+				url: "/ajax_data?dataName=userCheckin",
+				success: function(data)
+				{	
+					var json_list = JSON.parse(data);
+					var weekday_list = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+					
+					for (var i in weekday_list) {
+						var weekday = weekday_list[i];
+						Morris.Line({
+							element: 'userCheckin' + weekday + 'Chart',
+							data: json_list[weekday],
+							xkey: 'hour',
+							ykeys: ['checkins'],
+							labels: ['checkins'],
+							hideHover: 'auto',
+							resize: true,
+							parseTime:false
+						});
 					}
 				}
 			 });

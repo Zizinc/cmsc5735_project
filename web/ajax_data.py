@@ -1,5 +1,6 @@
 from flask import request
 from pyspark.sql.functions import udf
+from pyspark.sql.functions import split
 from pyspark.sql.types import IntegerType
 
 import json
@@ -26,6 +27,10 @@ class AjaxDataHandler:
 			return self.ajax_yelp_star_rating_distribution()
 		elif data_name == "analysisOnTopUsers":
 			return self.ajax_yelp_analysis_on_top_users()
+		elif data_name == "reviewNumbersDistribution":
+			return self.ajax_yelp_review_numbers_distribuion()
+		elif data_name == "userCheckin":
+			return self.ajax_yelp_user_checkin()
 		else:
 			msg = {"error_message": "data name is undefined"}
 			return json.dumps(msg)
@@ -152,6 +157,57 @@ class AjaxDataHandler:
 				"num_of_friends": row[4]
 			})
 		return json.dumps(top_user_list)
+	
+	def ajax_yelp_review_numbers_distribuion(self):
+		# Only focus on the first 50 review counts
+		max_review_count = 50
+		reviewDf = self.spark_engine.get_spark().sql("SELECT review_count, count(review_count) count FROM yelp_user GROUP BY review_count")
+		reviewDf = reviewDf.withColumn("review_count", reviewDf["review_count"].cast("int"))
+		reviewDf = reviewDf.filter(reviewDf["review_count"] <= max_review_count).orderBy(reviewDf["review_count"].asc())
+		
+		review_list = []
+		count_sum = 0
+		for row in reviewDf.collect():
+			count_sum += row[1]
+			review_list.append({
+				"review_count": row[0],
+				"count": row[1],
+				"pdf": 0,
+				"cdf": 0
+			})
+		
+		cdf_sum = 0
+		for review in review_list:
+			pdf = float(review["count"]) / count_sum
+			review["pdf"] = round(pdf, 4)
+			
+			cdf_sum += pdf
+			review["cdf"] = round(cdf_sum, 4)
+		return json.dumps(review_list)
+	
+	def ajax_yelp_user_checkin(self):
+		checkinDf = self.spark_engine.get_spark().sql("SELECT weekday, hour, checkins FROM yelp_checkin")
+		checkinDf = checkinDf.withColumn("checkins", checkinDf["checkins"].cast("int")) \
+			.withColumn("hour", split(checkinDf["hour"], ":")[0].cast("int"))
+		checkinDf = checkinDf.groupBy("weekday", "hour").agg({'checkins': 'sum'}).orderBy("weekday", "hour")
+		
+		checkin_data = {}
+		for row in checkinDf.collect():
+			weekday = row[0]
+			hour = row[1]
+			checkins = row[2]
+			if weekday in checkin_data:
+				checkin_data[weekday].append({
+					"hour": hour,
+					"checkins": checkins
+				})
+			else:
+				checkin_data[weekday] = [{
+					"hour": hour,
+					"checkins": checkins
+				}]
+		return json.dumps(checkin_data)
+		
 	
 	def __init__(self, spark_engine):
 		self.spark_engine = spark_engine
