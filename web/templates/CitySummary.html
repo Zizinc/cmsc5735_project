@@ -45,7 +45,7 @@
                         <a href="#"><i class="fa fa-desktop fa-3x"></i> User Behavior Analysis</a>
                     </li>
                     <li>
-                        <a href='/city'><i class="fa fa-desktop fa-3x"></i> User Summary</a>
+                        <a href='/usersummary'><i class="fa fa-desktop fa-3x"></i> User Summary</a>
                     </li>
                     <li>
                         <a href='/cityplot'><i class="fa fa-desktop fa-3x"></i> City Map Plot</a>
@@ -72,10 +72,28 @@
 							<div class="panel-heading">
 							   Spark Cluster Connection Status
 							</div>
+
 							<div class="panel-body">
 								<span class="label label-success">Success</span>
 								<p>Summary of famous cities</p>
                 <img src="/static/img/topCity.png" height="256" width="718">
+
+                <!-- Added -->
+                <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="panel panel-default">
+                <div class="panel-heading">
+                 City Summary
+                </div>
+                <div class="panel-body">
+                <button id="CitySummaryBtn">Run</button>
+                <div id="CitySummaryChart"></div>
+
+                </div>
+                </div>
+                </div>
+                </div>
+
                 <table>
                   <tr>
                     <th style="color:red">City</th>
@@ -193,6 +211,39 @@
 			} );
 		*/
 	</script>
+  <script  type="text/javascript">
+  $("#CitySummaryBtn").click(function(){
+    $.ajax({
+      type: "GET",
+      url: "/ajax_data?dataName=CitySummary",
+      success: function(data)
+      {
+        var json_list = JSON.parse(data);
+        Morris.Bar({
+          element: 'CitySummaryChart',
+          data: json_list,
+          xkey: 'x',
+          ykeys: ['y'],
+          labels: ['Famous City'],
+          hideHover: 'auto',
+          resize: true,
+          axes: true
+          /*
+          barColors: function (row, series, type) {
+            var color_list= ['#ff3333', '#ff7733', '#ffff33', '#47d147', '#33ffff', '#0066ff', '#cc0099'];
+            console.log(series);
+            console.log(series.index);
+            console.log(color_list[0]);
+            console.log(color_list[series.index % 7]);
+            return color_list[Math.floor((Math.random() * 7))];
+          }
+          */
+        });
+      }
+     });
+  });
+
+</script>
 
 </body>
 </html>

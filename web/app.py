@@ -13,12 +13,13 @@ def dashboard_page():
 	#Select those cities with review_count > 200
 	#city = distinctBusinessCityDf.collect()
 
-	UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
+	#UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
 	#Select those users with high review count
 
-	user = UserInfo.collect()
+	#user = UserInfo.collect()
 
-	return render_template('dashboard.html',user=user)
+	#return render_template('dashboard.html',user=user)
+	return render_template('dashboard.html')
 
 @main.route('/city')
 def City_Summary_Page():
@@ -27,12 +28,14 @@ def City_Summary_Page():
 	#Select those cities with review_count > 200
 	city = distinctBusinessCityDf.collect()
 
-	# UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
-	# #Select those users with high review count
-	#
-	# user = UserInfo.collect()
-
 	return render_template('CitySummary.html', city=city)
+@main.route('/usersummary')
+def User_Summary_Page():
+	UserInfo = engine.get_spark().sql("SELECT name,review_count,yelping_since,useful,average_stars FROM yelp_user WHERE review_count > 1000 ORDER BY review_count desc ")
+	#Select those users with high review count
+	userSummary = UserInfo.collect()
+
+	return render_template('usersummary.html', user=userSummary)
 @main.route('/cityplot')
 def City_Plot_Page():
 
