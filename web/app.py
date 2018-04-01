@@ -38,8 +38,65 @@ def User_Summary_Page():
 	return render_template('usersummary.html', user=userSummary)
 @main.route('/cityplot')
 def City_Plot_Page():
+	import pandas as pd
+	import io
+	import urllib
+	import base64
+	import warnings
+	import matplotlib.pyplot as plt
+	import seaborn as sns
+	import matplotlib.gridspec as gridspec
+	import matplotlib.gridspec as gridspec
+	pd.options.mode.chained_assignment = None  # default='warn'
+	business=pd.read_csv("/Users/tuxinzhang/Desktop/yelp-dataset/yelp_business.csv")
 
-	return render_template('CityPlot.html')
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,7))
+	rating_data=business[['latitude','longitude','stars','review_count']]
+	# Creating a custom column popularity using stars*no_of_reviews
+	rating_data['popularity']=rating_data['stars']*rating_data['review_count']
+
+	#a random point inside vegas
+	lat = 36.207430
+	lon = -115.268460
+	#some adjustments to get the right pic
+	lon_min, lon_max = lon-0.3,lon+0.5
+	lat_min, lat_max = lat-0.4,lat+0.5
+	#subset for vegas
+	ratings_data_vegas=rating_data[(rating_data["longitude"]>lon_min) &\
+	                    (rating_data["longitude"]<lon_max) &\
+	                    (rating_data["latitude"]>lat_min) &\
+	                    (rating_data["latitude"]<lat_max)]
+
+	#Facet scatter plot
+	ratings_data_vegas.plot(kind='scatter', x='longitude', y='latitude',
+	                color='yellow',
+	                s=.02, alpha=.6, subplots=True, ax=ax1)
+	ax1.set_title("Las Vegas")
+	ax1.set_facecolor('black')
+
+	#a random point inside pheonix
+	lat = 33.435463
+	lon = -112.006989
+	#some adjustments to get the right pic
+	lon_min, lon_max = lon-0.3,lon+0.5
+	lat_min, lat_max = lat-0.4,lat+0.5
+	#subset for pheonix
+	ratings_data_pheonix=rating_data[(rating_data["longitude"]>lon_min) &\
+	                    (rating_data["longitude"]<lon_max) &\
+	                    (rating_data["latitude"]>lat_min) &\
+	                    (rating_data["latitude"]<lat_max)]
+	#plot pheonix
+	ratings_data_pheonix.plot(kind='scatter', x='longitude', y='latitude',
+	                color='yellow',
+	                s=.02, alpha=.6, subplots=True, ax=ax2)
+	ax2.set_title("Pheonix")
+	ax2.set_facecolor('black')
+	#plt.show()
+	img = io.BytesIO()  # create the buffer
+	plt.savefig(img, format='png')
+	img.seek(0)  # rewind your buffer
+	plot_data = urllib.quote(base64.b64encode(img.read()).decode())
+	return render_template('CityPlot.html',plot_url = plot_data)
 
 @main.route('/ajax_data', methods=['GET'])
 def handle_ajax_data():
