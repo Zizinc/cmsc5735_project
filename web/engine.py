@@ -8,29 +8,29 @@ class SparkEngine:
         self.sc = SparkContext()
         self.sqlContext = SQLContext(self.sc)
         self.spark = SparkSession.builder \
-            .master("master") \
+            .config("spark.driver.allowMultipleContexts","true") \
+            .master("local") \
             .appName("SQL Query") \
             .getOrCreate()
-
+#            .config("spark.driver.allowMultipleContexts","true") \
     def load_csv_to_table(self):
-        file_path = "hdfs://master:9000/yelp-dataset/yelp_business.csv"
+        file_path = "/Users/tuxinzhang/Desktop/yelp-dataset/yelp_business.csv"
         yelpBusinessDf = self.spark.read \
             .csv(file_path, mode="DROPMALFORMED", header=True)
         yelpBusinessDf.registerTempTable("yelp_business")
 
-        file_path = "hdfs://master:9000/yelp-dataset/yelp_review.csv"
+        file_path = "/Users/tuxinzhang/Desktop/yelp-dataset/yelp_review_small.csv"
         yelpReviewDf = self.spark.read \
             .csv(file_path, mode="DROPMALFORMED", header=True, multiLine=True)
         yelpReviewDf.registerTempTable("yelp_review")
 
-        file_path = "hdfs://master:9000/yelp-dataset/yelp_user.csv"
-        yelpUserDf = self.spark.read \
-            .csv(file_path, mode="DROPMALFORMED", header=True, multiLine=True)
+        file_path = "/Users/tuxinzhang/Desktop/yelp-dataset/yelp_user_small.csv"
+        yelpUserDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True, multiLine=True)
         yelpUserDf.registerTempTable("yelp_user")
+        #yelpBusinessDf.write.saveAsTable("yelp_user")
 
-        file_path = "hdfs://master:9000/yelp-dataset/yelp_checkin.csv"
-        yelpCheckinDf = self.spark.read \
-            .csv(file_path, mode="DROPMALFORMED", header=True)
+        file_path = "/Users/tuxinzhang/Desktop/yelp-dataset/yelp_checkin_small.csv"
+        yelpCheckinDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True)
         yelpCheckinDf.registerTempTable("yelp_checkin")
 
     def get_sc(self):
