@@ -11,6 +11,14 @@ r_engine = RedisEngine()
 ajax_data_handler = AjaxDataHandler(spark_engine, r_engine)
 
 @app.route('/')
+<<<<<<< HEAD
+=======
+@app.route('/index.html')
+def index_page():
+    return render_template('index.html')
+
+
+>>>>>>> f3706f8ed5c345d3a4b731aa0e65c4a5cb39040b
 @app.route('/user_query')
 def user_query_page():
     return render_template('user_query.html')
