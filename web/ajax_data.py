@@ -215,8 +215,8 @@ class AjaxDataHandler:
         # Only focus on the first 50 review counts
         max_review_count = 50
         reviewDf = self.spark_engine.get_spark() \
-            .sql("SELECT review_count, count(review_count) count"
-                 "FROM yelp_user"
+            .sql("SELECT review_count, count(review_count) count "
+                 "FROM yelp_user "
                  "GROUP BY review_count")
         reviewDf = reviewDf \
             .withColumn("review_count", reviewDf["review_count"].cast("int"))
@@ -287,7 +287,7 @@ class AjaxDataHandler:
             return redis_data
         
         businessDf = self.spark_engine.get_spark() \
-            .sql("SELECT city, latitude, longitude, stars, review_count"
+            .sql("SELECT city, latitude, longitude, stars, review_count "
                  "FROM yelp_business")
         businessDf = businessDf.filter(businessDf["city"] == city)
         businessDf = businessDf \
