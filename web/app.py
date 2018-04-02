@@ -1,23 +1,16 @@
-from flask import Blueprint
+#from flask import Blueprint
 from flask import Flask, render_template, request
-from engine import SparkEngine
-
 from ajax_data import AjaxDataHandler
+from engine import SparkEngine
+from redis_engine import RedisEngine
+
 
 app = Flask(__name__)
 spark_engine = SparkEngine()
-ajax_data_handler = AjaxDataHandler(spark_engine)
-
+r_engine = RedisEngine()
+ajax_data_handler = AjaxDataHandler(spark_engine, r_engine)
 
 @app.route('/')
-@app.route('/dashboard')
-def dashboard_page():
-    # distinctBusinessCityDf = engine.get_spark().sql("SELECT distinct city
-    # FROM yelp_business ORDER BY city")
-    # city = distinctBusinessCityDf.collect()
-    return render_template('dashboard.html')
-
-
 @app.route('/user_query')
 def user_query_page():
     return render_template('user_query.html')
@@ -25,8 +18,12 @@ def user_query_page():
 
 @app.route('/featured_user_analysis')
 def featured_user_analysis_page():
-
     return render_template('featured_user_analysis.html')
+
+
+@app.route('/city_query')
+def city_query_page():
+    return render_template('city_query.html')
 
 
 @app.route('/featured_city_analysis')
