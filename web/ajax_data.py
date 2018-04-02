@@ -1,6 +1,14 @@
-import json
 
+from flask import request
+from pyspark.sql.functions import udf
+from pyspark.sql.functions import split
+from pyspark.sql.types import IntegerType
+
+import json
 class AjaxDataHandler:
+	def handle_post_ajax_data(self, data_name, request):
+		self.request = request
+		return self.handle_ajax_data(data_name)
 
 	def handle_ajax_data(self, data_name):
 		if data_name == "yelpTableInformation":
@@ -9,6 +17,9 @@ class AjaxDataHandler:
 			return self.ajax_citySummary()
 		elif data_name == "UserSummary":
 			return self.ajax_UserSummary()
+		elif data_name == "oneCity":
+			user_id = request.form["userId"]
+			return self.ajax_oneCity(user_id)
 		else:
 			msg = {"error_message": "data name is undefined"}
 			return json.dumps(msg)
@@ -32,6 +43,29 @@ class AjaxDataHandler:
 				"y": row[0]
 			})
 		return json.dumps(star_rating_distribution_list)
+		
+	def ajax_oneCity(self,user_id):
+		import pandas as pd
+		import warnings
+		import seaborn as sns
+		pd.options.mode.chained_assignment = None  # default='warn'
+		business=pd.read_csv("/Users/tuxinzhang/Desktop/yelp-dataset/yelp_business.csv")
+		Citybusiness = business[business['city'] == str(user_id)]
+		business_cats=' '.join(Citybusiness['categories'])
+		cats=pd.DataFrame(business_cats.split(';'),columns=['category'])
+		x=cats.category.value_counts()
+		#prep for chart
+		x=x.sort_values(ascending=False)
+		x=x.iloc[0:20]
+		tmp = []
+		for i in range(len(x.values)):
+			tmp.append({
+			"x":x.index[i],
+			"y":x.values[i]
+			})
+		return json.dumps(tmp)
+
+
 	def ajax_yelp_table_information(self):
 		yelp_table_list = [
 			{"table_name": "yelp_business", "num_of_record": "54,600", "num_of_col": "12"}

@@ -72,7 +72,22 @@
 							<div class="panel-heading">
 							   Spark Cluster Connection Status
 							</div>
+              <img src="data:image/png;base64, {{ plot_url |escape }}" style="width:1000px;height:400px;">
 
+              <!-- <div class="panel-body">
+								<span class="label label-success">Success</span>
+								<p>Top Categories</p>
+                <p>
+                  <img src="data:image/png;base64, {{ plot_url |escape }}" style="width:1000px;height:400px;">
+
+                  <img src="/static/img/phe.png" alt="phe" style="width:500px;height:600px;"> -->
+                </p>
+                <!-- <p>
+                  <img src="/static/img/edin.png" alt="edin" style="width:500px;height:600px;">
+                  <img src="/static/img/stu.png" alt="stu" style="width:500px;height:600px;">
+                </p> -->
+
+							</div> -->
 							<div class="panel-body">
 								<span class="label label-success">Success</span>
 								<p>Summary of famous cities</p>
@@ -90,6 +105,27 @@
                 <div id="CitySummaryChart"></div>
 
                 </div>
+
+                <div class="panel-body">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
+
+<!-- City Name input -->
+                <form id="userQueryForm" role="form">
+                <div class="form-group">
+                <label>City Name</label>
+                      <input class="form-control" type="text" name="userId" />
+
+                </div>
+                <button id="submitBtn" type="submit" class="btn btn-default">Submit Button</button>
+
+                </form>
+                </div>
+
+                <button id="oneCityBtn">Run</button>
+                <div id="oneCityChart"></div>
+
+                </div>
+
                 </div>
                 </div>
                 </div>
@@ -109,25 +145,6 @@
 
                 {% endfor %}
               </table>
-                <!-- <img src="/static/img/stars_rating.png" height="256" width="718">
-                <table width="550">
-                  <tr>
-                    <th style="color:red">Name</th>
-                    <th style="color:red">Review_count</th>
-                    <th style="color:red">Since</th>
-                    <th style="color:red">Useful</th>
-                    <th style="color:red">Average Stars</th>
-                  </tr>
-                  {% for u in user%}
-                  <tr>
-                  <td>{{u.name | escape }}</td>
-                  <td>{{u.review_count}}</td>
-                  <td>{{u.yelping_since}}</td>
-                  <td>{{u.useful}}</td>
-                  <td>{{u.average_stars}}</td>
-                  </tr>
-                  {% endfor %}
-                </table> -->
 							</div>
 						</div>
 					</div>
@@ -193,24 +210,56 @@
 			}
 		});
 
-		/*
-			$('#yelpTableInformation').DataTable( {
-				"ajax": "/ajax_data?dataName=yelpTableInformation",
-				"dataSrc" : function (json) {
-					// manipulate your data (json)
-					console.log(json);
-
-					// return the data that DataTables is to use to draw the table
-					return json.data;
-				},
-				"columns": [
-                    { "data": "table_name" },
-                    { "data": "num_of_record" },
-                    { "data": "num_of_col" },
-                    ]
-			} );
-		*/
 	</script>
+  <script  type="text/javascript">
+  $("#oneCityBtn").click(function(){
+    $.ajax({
+      type: "GET",
+      url: "/ajax_data?dataName=oneCity",
+      success: function(data)
+      {
+        var json_list = JSON.parse(data);
+        Morris.Bar({
+          element: 'oneCityChart',
+          data: json_list,
+          xkey: 'x',
+          ykeys: ['y'],
+          labels: ['One City'],
+          hideHover: 'auto',
+          resize: true,
+          axes: true
+        });
+      }
+     });
+  });
+  function updateOneCityChart() {
+  $.ajax({
+    type: "POST",
+    url: "/ajax_data?dataName=oneCity",
+    data: $("#userQueryForm").serialize(), // serializes the form's elements.
+    success: function(data)
+    {
+      $("#submitBtn").prop("disabled", false);
+      var json_list = JSON.parse(data);
+      Morris.Bar({
+        element: 'oneCityChart',
+        data: json_list,
+        xkey: 'x',
+        ykeys: ['y'],
+        labels: ['One City'],
+        hideHover: 'auto',
+        resize: true,
+        axes: true
+      });
+    }
+   });
+}
+  $("#userQueryForm").submit(function(e) {
+    $("#submitBtn").prop("disabled", true);
+    updateOneCityChart();
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+  });
+</script>
   <script  type="text/javascript">
   $("#CitySummaryBtn").click(function(){
     $.ajax({
@@ -228,16 +277,6 @@
           hideHover: 'auto',
           resize: true,
           axes: true
-          /*
-          barColors: function (row, series, type) {
-            var color_list= ['#ff3333', '#ff7733', '#ffff33', '#47d147', '#33ffff', '#0066ff', '#cc0099'];
-            console.log(series);
-            console.log(series.index);
-            console.log(color_list[0]);
-            console.log(color_list[series.index % 7]);
-            return color_list[Math.floor((Math.random() * 7))];
-          }
-          */
         });
       }
      });
