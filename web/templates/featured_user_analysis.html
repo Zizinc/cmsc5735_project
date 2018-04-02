@@ -241,11 +241,13 @@
     <!-- SCRIPTS ON PAGE -->
 	<script  type="text/javascript">
 		$("#starRatingDistributionBtn").click(function(){
+			$("#starRatingDistributionBtn").prop("disabled", true);
 			$.ajax({
 				type: "GET",
 				url: "/ajax_data?dataName=starRatingDistribution",
 				success: function(data)
 				{	
+					$("#starRatingDistributionBtn").prop("disabled", false);
 					var json_list = JSON.parse(data);
 					Morris.Bar({
 						element: 'starRatingDistributionChart',
@@ -296,11 +298,13 @@
 			});
 		}
 		$("#analysisOnTopUsersBtn").click(function(){
+			$("#analysisOnTopUsersBtn").prop("disabled", true);
 			$.ajax({
 				type: "GET",
 				url: "/ajax_data?dataName=analysisOnTopUsers",
 				success: function(data)
 				{	
+					$("#analysisOnTopUsersBtn").prop("disabled", false);
 					var json_list = JSON.parse(data);
 					var reviewCountAndUseful = [];
 					var reviewCountAndFans = [];
@@ -390,11 +394,13 @@
 	</script>
 	<script  type="text/javascript">
 		$("#reviewNumbersDistributionBtn").click(function(){
+			$("#reviewNumbersDistributionBtn").prop("disabled", true);
 			$.ajax({
 				type: "GET",
 				url: "/ajax_data?dataName=reviewNumbersDistribution",
 				success: function(data)
 				{	
+					$("#reviewNumbersDistributionBtn").prop("disabled", false);
 					var json_list = JSON.parse(data);
 					Morris.Line({
 						element: 'reviewNumbersPdfChart',
@@ -423,14 +429,16 @@
 	</script>
 	<script  type="text/javascript">
 		$("#userCheckinPatternsBtn").click(function(){
+			$("#userCheckinPatternsBtn").prop("disabled", true);
 			$.ajax({
 				type: "GET",
 				url: "/ajax_data?dataName=userCheckin",
 				success: function(data)
 				{	
+					$("#userCheckinPatternsBtn").prop("disabled", false);
 					var json_list = JSON.parse(data);
 					var weekday_list = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-					
+					var color_list = ['#ff3333', '#ff7733', '#ffff33', '#47d147', '#33ffff', '#0066ff', '#cc0099'];
 					for (var i in weekday_list) {
 						var weekday = weekday_list[i];
 						Morris.Line({
@@ -439,6 +447,7 @@
 							xkey: 'hour',
 							ykeys: ['checkins'],
 							labels: ['checkins'],
+							lineColors: [color_list[i]],
 							hideHover: 'auto',
 							resize: true,
 							parseTime:false

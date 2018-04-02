@@ -15,19 +15,19 @@ class SparkEngine:
 
 	def load_csv_to_table(self):
 		file_path = "data/yelp_business.csv"
-		yelpBusinessDf = self.spark.read.csv(file_path, header=True)
+		yelpBusinessDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True)
 		yelpBusinessDf.registerTempTable("yelp_business")
 		
 		file_path = "data/yelp_review_small_1000.csv"
-		yelpReviewDf = self.spark.read.csv(file_path, header=True, multiLine=True)
+		yelpReviewDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True, multiLine=True)
 		yelpReviewDf.registerTempTable("yelp_review")
 		
 		file_path = "data/yelp_user_small_1000.csv"
-		yelpUserDf = self.spark.read.csv(file_path, header=True, mode="DROPMALFORMED", multiLine=True)
+		yelpUserDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True, multiLine=True)
 		yelpUserDf.registerTempTable("yelp_user")
 		
 		file_path = "data/yelp_checkin_small_1000.csv"
-		yelpCheckinDf = self.spark.read.csv(file_path, header=True)
+		yelpCheckinDf = self.spark.read.csv(file_path, mode="DROPMALFORMED", header=True)
 		yelpCheckinDf.registerTempTable("yelp_checkin")
 		
 		# Test

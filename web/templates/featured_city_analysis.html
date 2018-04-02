@@ -66,10 +66,10 @@
 								<form id="cityQueryForm" role="form">
 									<div class="form-group">
 										<label>City</label>
-										<input class="form-control" type="text" name="city" placeholder="Las Vegas" />
+										<input class="form-control" type="text" name="city" value="Las Vegas" />
 
 									</div>
-									<button type="submit" class="btn btn-default">Submit Button</button>
+									<button type="submit" id="citySubmitBtn" class="btn btn-default">Submit Button</button>
 
 								</form>
 								<br/>
@@ -105,13 +105,14 @@
 <script>
 	var map;
 	$("#cityQueryForm").submit(function(e) {
-		
+		$("#citySubmitBtn").prop("disabled", true);
 		$.ajax({
 			type: "POST",
 			url: "/ajax_data?dataName=businessHeatMap",
 			data: $("#cityQueryForm").serialize(), // serializes the form's elements.
 			success: function(data)
 			{	
+				$("#citySubmitBtn").prop("disabled", false);
 				var json_list = JSON.parse(data);
 				var map_center = json_list["map_center"];
 				var business_list = json_list["business_list"];

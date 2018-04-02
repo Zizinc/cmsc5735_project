@@ -29,13 +29,6 @@ COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
 
-# SETUP DATA (can be remove in production)
-COPY ./data /data
-
-# Run without Spark
-#ENTRYPOINT ["python"]
-#CMD ["app.py"]
-
 # Run with Spark in local
 ENTRYPOINT ["spark-submit"]
 CMD ["server.py"]
