@@ -138,9 +138,9 @@ class AjaxDataHandler:
         ''' % (user_id)
         key = "yelp_reviews_by_user_id-" + user_id
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-        
+
         yelpReviewInfoDf = self.spark_engine.get_spark().sql(sql)
         yelp_review_info = []
         for row in yelpReviewInfoDf.collect():
@@ -153,33 +153,35 @@ class AjaxDataHandler:
                 "funny": row[5],
                 "cool": row[6]
             })
-        
+
         self.r_engine.set(key, json.dumps(yelp_review_info))
         return json.dumps(yelp_review_info)
 
     def ajax_yelp_star_rating_distribution(self):
         key = "yelp_star_rating_distribution"
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-            
-        starRatingDistributionDf = self.spark_engine.get_spark().sql("SELECT stars, count(business_id) FROM yelp_business GROUP BY stars ORDER BY stars")
+
+        starRatingDistributionDf = self.spark_engine.get_spark() \
+            .sql("SELECT stars, count(business_id) "
+                 "FROM yelp_business GROUP BY stars ORDER BY stars")
         star_rating_distribution_list = []
         for row in starRatingDistributionDf.collect():
             star_rating_distribution_list.append({
                 "x": row[0],
                 "y": row[1]
             })
-        
+
         self.r_engine.set(key, json.dumps(star_rating_distribution_list))
         return json.dumps(star_rating_distribution_list)
 
     def ajax_yelp_analysis_on_top_users(self):
         key = "yelp_analysis_on_top_users"
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-    
+
         topUsersDf = self.spark_engine.get_spark() \
             .sql("SELECT review_count, friends, useful, fans FROM yelp_user")
         topUsersDf = topUsersDf \
@@ -202,16 +204,16 @@ class AjaxDataHandler:
                 "fans": row[3],
                 "num_of_friends": row[4]
             })
-        
+
         self.r_engine.set(key, json.dumps(top_user_list))
         return json.dumps(top_user_list)
 
     def ajax_yelp_review_numbers_distribuion(self):
         key = "yelp_review_numbers_distribuion"
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-            
+
         # Only focus on the first 50 review counts
         max_review_count = 50
         reviewDf = self.spark_engine.get_spark() \
@@ -242,16 +244,16 @@ class AjaxDataHandler:
 
             cdf_sum += pdf
             review["cdf"] = round(cdf_sum, 4)
-        
+
         self.r_engine.set(key, json.dumps(review_list))
         return json.dumps(review_list)
 
     def ajax_yelp_user_checkin(self):
         key = "yelp_user_checkin"
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-            
+
         checkinDf = self.spark_engine.get_spark() \
             .sql("SELECT weekday, hour, checkins FROM yelp_checkin")
         checkinDf = checkinDf \
@@ -276,16 +278,16 @@ class AjaxDataHandler:
                     "hour": hour,
                     "checkins": checkins
                 }]
-            
+
         self.r_engine.set(key, json.dumps(checkin_data))
         return json.dumps(checkin_data)
 
     def ajax_yelp_business_heat_map(self, city):
         key = "yelp_business_heat_map-" + city
         redis_data = self.r_engine.get(key)
-        if redis_data != None:
+        if redis_data is not None:
             return redis_data
-        
+
         businessDf = self.spark_engine.get_spark() \
             .sql("SELECT city, latitude, longitude, stars, review_count "
                  "FROM yelp_business")
@@ -321,7 +323,7 @@ class AjaxDataHandler:
             "map_center": map_center,
             "business_list": business_list
             }
-        
+
         self.r_engine.set(key, json.dumps(data))
         return json.dumps(data)
 

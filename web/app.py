@@ -1,4 +1,3 @@
-#from flask import Blueprint
 from flask import Flask, render_template, request
 from ajax_data import AjaxDataHandler
 from engine import SparkEngine
@@ -9,6 +8,7 @@ app = Flask(__name__)
 spark_engine = SparkEngine()
 r_engine = RedisEngine()
 ajax_data_handler = AjaxDataHandler(spark_engine, r_engine)
+
 
 @app.route('/')
 @app.route('/index.html')
