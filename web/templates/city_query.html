@@ -13,6 +13,9 @@
         <!-- CUSTOM STYLES-->
     <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
 	<link href="{{ url_for('static', filename='css/leaflet.css') }}" rel="stylesheet" />
+	<style>
+        #cityHeatMap { width: 800px; height: 600px; }
+    </style>
      <!-- GOOGLE FONTS-->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 </head>
@@ -43,10 +46,10 @@
 						<a href="/featured_user_analysis"><i class="fa fa-user fa-3x"></i> Featured User Analysis </a>
 					</li>
 					<li>
-						<a href="/city_query"><i class="fa fa-search fa-3x"></i> City Query </a>
+						<a class="active-menu" href="/city_query"><i class="fa fa-search fa-3x"></i> City Query </a>
 					</li>
 					<li>
-						<a class="active-menu" href="/featured_city_analysis"><i class="fa fa-globe fa-3x"></i> Featured City Analysis </a>
+						<a href="/featured_city_analysis"><i class="fa fa-globe fa-3x"></i> Featured City Analysis </a>
 					</li>
                 </ul>
             </div>
@@ -65,42 +68,49 @@
 					<div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="panel panel-default">
 							<div class="panel-heading">
-							   Top Categories
+							   City Heat Map
 							</div>
-							<img src="data:image/png;base64, {{ plot_url |escape }}" style="width:1000px;height:400px;">
+							<div class="panel-body">
+								<form id="cityQueryForm" role="form">
+									<div class="form-group">
+										<label>City</label>
+										<input class="form-control" type="text" name="city" value="Las Vegas" />
+
+									</div>
+									<button type="submit" id="citySubmitBtn" class="btn btn-default">Submit Button</button>
+
+								</form>
+								<br/>
+								<div id="cityHeatMap"></div>
+							</div>
 						</div>
 					</div>
 				</div>
 				 <!-- /. ROW  -->
                   <hr />
-                <div class="row">
+				<div class="row">
 					<div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="panel panel-default">
+						<div class="panel panel-default">
 							<div class="panel-heading">
-							   Popular City
+							 City Summary
 							</div>
 							<div class="panel-body">
-								<div class="table-responsive">
-									<table class="table table-striped table-bordered table-hover">
-										<tr>
-											<th style="color:red">City</th>
-											<th style="color:red">Name</th>
-											<th style="color:red">Review Count</th>
-										</tr>
-										{% for c in city%}
-										<tr>
-											<td>{{c.city}}</td>
-											<td>{{c.name | escape }}</td>
-											<td>{{c.review_count}}</td>
-										</tr>
-										{% endfor %}
-									</table>
-								<br/>
+								<div class="col-md-12 col-sm-12 col-xs-12">
+									<!-- City Name input -->
+									<form id="userQueryForm" role="form">
+										<div class="form-group">
+											<label>City Name</label>
+											  <input class="form-control" type="text" name="userId" />
+										</div>
+										<button id="submitBtn" type="submit" class="btn btn-default">Submit Button</button>
+									</form>
+									<br>
+									<div id="oneCityChart"></div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+                </div>
              <!-- /. PAGE INNER  -->
             </div>
          <!-- /. PAGE WRAPPER  -->
@@ -126,7 +136,67 @@
 	<script src="{{ url_for('static', filename='js/leaflet/realworld.10000.js') }}"></script>
     <!-- SCRIPTS ON PAGE -->
 <script>
+	var map;
+	$("#cityQueryForm").submit(function(e) {
+		$("#citySubmitBtn").prop("disabled", true);
+		$.ajax({
+			type: "POST",
+			url: "/ajax_data?dataName=businessHeatMap",
+			data: $("#cityQueryForm").serialize(), // serializes the form's elements.
+			success: function(data)
+			{	
+				$("#citySubmitBtn").prop("disabled", false);
+				var json_list = JSON.parse(data);
+				var map_center = json_list["map_center"];
+				var business_list = json_list["business_list"];
+				//var map_center = [-37.87, 175.475];
+				//var business_list = addressPoints;
+				if (map != undefined) { map.remove(); }
+				map = L.map('cityHeatMap').setView(map_center, 12);
 
+				var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+					attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+				}).addTo(map);
+
+				business_list = business_list.map(function (p) { return [p[0], p[1]]; });
+
+				var heat = L.heatLayer(business_list, {radius: 14}).addTo(map);
+			}
+		 });
+		
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+	});
+
+</script>
+<script>
+  function updateOneCityChart() {
+  $.ajax({
+    type: "POST",
+    url: "/ajax_data?dataName=oneCity",
+    data: $("#userQueryForm").serialize(), // serializes the form's elements.
+    success: function(data)
+    {
+      $("#submitBtn").prop("disabled", false);
+      var json_list = JSON.parse(data);
+	  $("#oneCityChart").empty();
+      Morris.Bar({
+        element: 'oneCityChart',
+        data: json_list,
+        xkey: 'x',
+        ykeys: ['y'],
+        labels: ['One City'],
+        hideHover: 'auto',
+        resize: true,
+        axes: true
+      });
+    }
+   });
+}
+  $("#userQueryForm").submit(function(e) {
+    $("#submitBtn").prop("disabled", true);
+    updateOneCityChart();
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+  });
 </script>
 </body>
 </html>
