@@ -257,6 +257,7 @@
 				{	
 					$("#starRatingDistributionBtn").prop("disabled", false);
 					var json_list = JSON.parse(data);
+					$("#starRatingDistributionChart").empty();
 					Morris.Bar({
 						element: 'starRatingDistributionChart',
 						data: json_list,
@@ -409,6 +410,7 @@
 				success: function(data)
 				{	
 					$("#reviewNumbersDistributionBtn").prop("disabled", false);
+					$("#reviewNumbersPdfChart").empty();
 					var json_list = JSON.parse(data);
 					Morris.Line({
 						element: 'reviewNumbersPdfChart',
@@ -421,6 +423,7 @@
 						parseTime:false
 					});
 					
+					$("#reviewNumbersCdfChart").empty();
 					Morris.Line({
 						element: 'reviewNumbersCdfChart',
 						data: json_list,
@@ -449,6 +452,7 @@
 					var color_list = ['#ff3333', '#ff7733', '#ffff33', '#47d147', '#33ffff', '#0066ff', '#cc0099'];
 					for (var i in weekday_list) {
 						var weekday = weekday_list[i];
+						$('#' + 'userCheckin' + weekday + 'Chart').empty();
 						Morris.Line({
 							element: 'userCheckin' + weekday + 'Chart',
 							data: json_list[weekday],
