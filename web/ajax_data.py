@@ -36,6 +36,13 @@ class AjaxDataHandler:
         elif data_name == "businessHeatMap":
             city = request.form["city"]
             return self.ajax_yelp_business_heat_map(city)
+        elif data_name == "CitySummary":
+			return self.ajax_citySummary()
+        elif data_name == "UserSummary" :
+			return self.ajax_UserSummary()
+        elif data_name == "oneCity":
+			user_id = request.form["userId"]
+			return self.ajax_oneCity(user_id)
         else:
             msg = {"error_message": "data name is undefined"}
             return json.dumps(msg)
@@ -56,6 +63,60 @@ class AjaxDataHandler:
         ]
         return json.dumps(yelp_table_list)
 
+    def ajax_citySummary(self):
+        key = "ajax_citySummary-"
+        redis_data = self.r_engine.get(key)
+        if redis_data is not None:
+            return redis_data
+        ajax_citySummary = self.spark_engine.get_spark().sql("SELECT city,sum(review_count) FROM yelp_business WHERE review_count > 450 GROUP BY city ORDER BY sum(review_count) desc ")
+        star_rating_distribution_list = []
+        for row in ajax_citySummary.collect():
+        	star_rating_distribution_list.append({
+        		"x": row[0],
+        		"y": row[1]
+        	})
+        self.r_engine.set(key, json.dumps(star_rating_distribution_list))
+        return json.dumps(star_rating_distribution_list)
+		#return json.dumps(yelp_table_list)
+    def ajax_UserSummary(self):
+        key = "ajax_UserSummary-"
+        redis_data = self.r_engine.get(key)
+        if redis_data is not None:
+            return redis_data
+    	ajax_UserSummary = self.spark_engine.get_spark().sql("SELECT review_count,average_stars FROM yelp_user WHERE review_count > 450 ORDER BY average_stars desc ")
+    	star_rating_distribution_list = []
+    	for row in ajax_UserSummary.collect():
+    		star_rating_distribution_list.append({
+    			"x": row[1],
+    			"y": row[0]
+    		})
+        self.r_engine.set(key, json.dumps(star_rating_distribution_list))
+    	return json.dumps(star_rating_distribution_list)
+
+    def ajax_oneCity(self,user_id):
+        key = "ajax_oneCity-" + user_id
+        redis_data = self.r_engine.get(key)
+        if redis_data is not None:
+            return redis_data
+    	import pandas as pd
+    	import warnings
+    	pd.options.mode.chained_assignment = None  # default='warn'
+    	business=pd.read_csv("/Users/tuxinzhang/Desktop/yelp-dataset/yelp_business.csv")
+    	Citybusiness = business[business['city'] == str(user_id)]
+    	business_cats=' '.join(Citybusiness['categories'])
+    	cats=pd.DataFrame(business_cats.split(';'),columns=['category'])
+    	x=cats.category.value_counts()
+    	#prep for chart
+    	x=x.sort_values(ascending=False)
+    	x=x.iloc[0:20]
+    	tmp = []
+    	for i in range(len(x.values)):
+    		tmp.append({
+    		"x":x.index[i],
+    		"y":x.values[i]
+    		})
+        self.r_engine.set(key, json.dumps(tmp))
+    	return json.dumps(tmp)
     def ajax_yelp_user_basic_information_by_user_id(self, user_id):
         '''
         # Sample data
