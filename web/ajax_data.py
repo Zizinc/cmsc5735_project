@@ -8,7 +8,7 @@ import json
 
 def count_num_of_friends(friend_string):
     return len(friend_string.split(','))
-
+s
 
 class AjaxDataHandler:
 
