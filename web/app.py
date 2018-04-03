@@ -2,8 +2,10 @@ from flask import Flask, render_template, request
 from ajax_data import AjaxDataHandler
 from engine import SparkEngine
 from redis_engine import RedisEngine
+import matplotlib
 
 
+matplotlib.use('Agg')
 app = Flask(__name__)
 spark_engine = SparkEngine()
 r_engine = RedisEngine()
@@ -42,6 +44,7 @@ def featured_city_analysis_page():
     import matplotlib.pyplot as plt
     import matplotlib.gridspec as gridspec
     import matplotlib.gridspec as gridspec
+
     pd.options.mode.chained_assignment = None  # default='warn'
     #business=pd.read_csv("data/yelp_business_small_1000.csv")
     business = spark_engine.get_spark().sql("SELECT * FROM yelp_business")
