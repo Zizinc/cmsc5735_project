@@ -5,7 +5,7 @@ class RedisEngine:
 
     def init_redis_component(self):
         self.r = redis.Redis(
-            host='master',
+            host='localhost',
             port=6379,
             )
 
